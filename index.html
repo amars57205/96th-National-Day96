@@ -204,4 +204,58 @@
         // ===== الإعدادات =====
         const IMAGES_FOLDER = '';      // '' = الصور بجانب index.html. اكتب 'images/' إذا نقلتها لمجلد
         const totalImages = 150;       // أعلى رقم صورة
-        const SECONDS_PER_IMAGE =
+        const SECONDS_PER_IMAGE = 4;   // زد الرقم لإبطاء الحركة
+        const EXTENSIONS = ['jpeg', 'jpg', 'JPEG', 'JPG', 'png'];
+
+        const track = document.getElementById('cinemaTrack');
+        const statusLine = document.getElementById('statusLine');
+        const missing = [];
+
+        function updateStatus() {
+            const shown = totalImages - missing.length;
+            statusLine.textContent = `الصور المعروضة: ${shown} من ${totalImages}` +
+                (missing.length ? ` — الناقصة: ${missing.slice().sort((a, b) => a - b).join('، ')}` : '');
+        }
+
+        // ينشئ عنصر صورة يجرّب الامتدادات تباعاً، وإن فشلت كلها يحذف نفسه
+        function buildItem(n, isFirstCopy) {
+            const item = document.createElement('div');
+            item.className = 'cinema-item';
+
+            const img = document.createElement('img');
+            img.alt = `احتفالية اليوم الوطني ${n}`;
+            let tryIndex = 0;
+
+            img.onerror = () => {
+                tryIndex++;
+                if (tryIndex < EXTENSIONS.length) {
+                    img.src = `${IMAGES_FOLDER}${n}.${EXTENSIONS[tryIndex]}`;
+                } else {
+                    item.remove();
+                    if (isFirstCopy) { missing.push(n); updateStatus(); }
+                }
+            };
+            img.src = `${IMAGES_FOLDER}${n}.${EXTENSIONS[0]}`;
+
+            const caption = document.createElement('div');
+            caption.className = 'cinema-caption';
+            caption.textContent = `احتفالية اليوم الوطني ${n}`;
+
+            item.appendChild(img);
+            item.appendChild(caption);
+            return item;
+        }
+
+        // نسختان من الصور لضمان حركة دائرية سلسة
+        for (let copy = 0; copy < 2; copy++) {
+            for (let n = 1; n <= totalImages; n++) {
+                track.appendChild(buildItem(n, copy === 0));
+            }
+        }
+
+        updateStatus();
+        track.style.setProperty('--duration', (totalImages * SECONDS_PER_IMAGE) + 's');
+        track.classList.add('running');
+    </script>
+</body>
+</html>
