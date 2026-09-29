@@ -106,15 +106,6 @@
             animation-play-state: paused;
         }
 
-        .track-message {
-            color: var(--accent-gold);
-            font-size: 1.3rem;
-            padding: 60px 40px;
-            width: 100vw;
-            text-align: center;
-            direction: rtl;
-        }
-
         /* أبعاد كل عنصر عرض */
         .cinema-item {
             width: 520px;
@@ -152,3 +143,65 @@
             text-align: center;
             font-size: 1.1rem;
             color: #fff;
+            font-weight: 700;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            direction: rtl;
+        }
+
+        @keyframes scrollCinemaSlow {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #6b8277;
+            font-size: 0.95rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        #statusLine {
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #56695f;
+        }
+
+        /* التوافقية مع الشاشات المتنوعة والجوالات */
+        @media screen and (max-width: 768px) {
+            header h1 { font-size: 1.8rem; }
+            header p { font-size: 0.95rem; }
+            .cinema-item { width: 320px; height: 220px; }
+        }
+
+        @media screen and (max-width: 480px) {
+            header h1 { font-size: 1.4rem; }
+            .cinema-item { width: 260px; height: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>الاحتفال باليوم الوطني السعودي بمدرسة عمار بن ياسر الابتدائية</h1>
+        <p>نحلم ونحقق - الشريط السينمائي الهادئ</p>
+        <div class="divider"></div>
+    </header>
+
+    <div class="cinema-track-container" id="cinemaContainer">
+        <div class="cinema-track" id="cinemaTrack"></div>
+    </div>
+
+    <footer>
+        <div id="statusLine"></div>
+        تصميم وبرمجة أ.صلاح سعد الرحيمان
+    </footer>
+
+    <script>
+        // ===== الإعدادات =====
+        const IMAGES_FOLDER = '';      // '' = الصور بجانب index.html. اكتب 'images/' إذا نقلتها لمجلد
+        const totalImages = 150;       // أعلى رقم صورة
+        const SECONDS_PER_IMAGE =
