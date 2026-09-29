@@ -98,9 +98,9 @@ html
             animation: none;
         }
 
-        /* سرعة العرض تحسب تلقائياً حسب عدد الصور */
+        /* مدة الدورة تضبط من الإعدادات داخل السكربت */
         .cinema-track.running {
-            animation: scrollCinemaSlow var(--duration, 500s) linear infinite;
+            animation: scrollCinemaSlow var(--duration, 400s) linear infinite;
         }
 
         .cinema-track:hover {
@@ -167,8 +167,8 @@ html
 
         #statusLine {
             margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: #56695f;
+            font-size: 0.8rem;
+            color: #4d6157;
         }
 
         /* التوافقية مع الشاشات المتنوعة والجوالات */
@@ -203,20 +203,16 @@ html
 
     <script>
         // ===== الإعدادات =====
-        const IMAGES_FOLDER = '';      // '' = الصور بجانب index.html. اكتب 'images/' إذا نقلتها لمجلد
-        const totalImages = 150;       // أعلى رقم صورة
-        const SECONDS_PER_IMAGE = 4;   // زد الرقم لإبطاء الحركة
+        const IMAGES_FOLDER = '';       // '' = الصور بجانب index.html. اكتب 'images/' إذا نقلتها لمجلد
+        const MAX_NUMBER = 150;         // أعلى رقم يفحصه (يعرض الموجود فقط ويتخطى الناقص)
+        const DURATION_SECONDS = 400;   // مدة الدورة الكاملة: زدها للإبطاء وقلّلها للتسريع
         const EXTENSIONS = ['jpeg', 'jpg', 'JPEG', 'JPG', 'png'];
+        const VERSION = 3;
 
         const track = document.getElementById('cinemaTrack');
         const statusLine = document.getElementById('statusLine');
-        const missing = [];
-
-        function updateStatus() {
-            const shown = totalImages - missing.length;
-            statusLine.textContent = `الصور المعروضة: ${shown} من ${totalImages}` +
-                (missing.length ? ` — الناقصة: ${missing.slice().sort((a, b) => a - b).join('، ')}` : '');
-        }
+        let found = 0;
+        statusLine.textContent = `الإصدار ${VERSION} — جاري تحميل الصور...`;
 
         // ينشئ عنصر صورة يجرّب الامتدادات تباعاً، وإن فشلت كلها يحذف نفسه
         function buildItem(n, isFirstCopy) {
@@ -227,13 +223,19 @@ html
             img.alt = `احتفالية اليوم الوطني ${n}`;
             let tryIndex = 0;
 
+            img.onload = () => {
+                if (isFirstCopy) {
+                    found++;
+                    statusLine.textContent = `الإصدار ${VERSION} — عدد الصور المعروضة: ${found}`;
+                }
+            };
+
             img.onerror = () => {
                 tryIndex++;
                 if (tryIndex < EXTENSIONS.length) {
                     img.src = `${IMAGES_FOLDER}${n}.${EXTENSIONS[tryIndex]}`;
                 } else {
                     item.remove();
-                    if (isFirstCopy) { missing.push(n); updateStatus(); }
                 }
             };
             img.src = `${IMAGES_FOLDER}${n}.${EXTENSIONS[0]}`;
@@ -249,13 +251,12 @@ html
 
         // نسختان من الصور لضمان حركة دائرية سلسة
         for (let copy = 0; copy < 2; copy++) {
-            for (let n = 1; n <= totalImages; n++) {
+            for (let n = 1; n <= MAX_NUMBER; n++) {
                 track.appendChild(buildItem(n, copy === 0));
             }
         }
 
-        updateStatus();
-        track.style.setProperty('--duration', (totalImages * SECONDS_PER_IMAGE) + 's');
+        track.style.setProperty('--duration', DURATION_SECONDS + 's');
         track.classList.add('running');
     </script>
 </body>
