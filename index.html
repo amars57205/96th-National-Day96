@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- حماية متقدمة ضد الـ XSS وحقن الأكواد -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';">
     <title>الاحتفال باليوم الوطني السعودي - الشريط السينمائي الفاخر</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
@@ -64,7 +63,6 @@
             margin: 15px auto;
         }
 
-        /* حاوية الشريط السينمائي المتحرك */
         .cinema-track-container {
             width: 100%;
             overflow: hidden;
@@ -77,7 +75,6 @@
             margin: auto 0;
         }
 
-        /* إطارات شريط الفيلم السينمائي الجانبية */
         .cinema-track-container::before,
         .cinema-track-container::after {
             content: '';
@@ -95,16 +92,13 @@
             display: flex;
             gap: 30px;
             width: max-content;
-            /* تبدأ الحركة تلقائياً وتتحرك من اليمين إلى اليسار بسرع 500 ثانية */
             animation: scrollRightToLeft 500s linear infinite; 
         }
 
-        /* إيقاف الحركة تماماً عند وضع الماوس على الشريط ككل أو على العناصر */
         .cinema-track-container:hover .cinema-track {
             animation-play-state: paused; 
         }
 
-        /* أبعاد كل عنصر عرض */
         .cinema-item {
             width: 520px;
             height: 350px;
@@ -148,7 +142,6 @@
             text-overflow: ellipsis;
         }
 
-        /* حركة خروج الصور من اليمين إلى اليسار بسلاسة تامة */
         @keyframes scrollRightToLeft {
             0% {
                 transform: translateX(0);
@@ -173,28 +166,15 @@
             border-top: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* التوافقية التامة مع الشاشات المتنوعة والجوالات الذكية */
         @media screen and (max-width: 768px) {
-            header h1 {
-                font-size: 1.8rem;
-            }
-            header p {
-                font-size: 0.95rem;
-            }
-            .cinema-item {
-                width: 320px;
-                height: 220px;
-            }
+            header h1 { font-size: 1.8rem; }
+            header p { font-size: 0.95rem; }
+            .cinema-item { width: 320px; height: 220px; }
         }
 
         @media screen and (max-width: 480px) {
-            header h1 {
-                font-size: 1.4rem;
-            }
-            .cinema-item {
-                width: 260px;
-                height: 180px;
-            }
+            header h1 { font-size: 1.4rem; }
+            .cinema-item { width: 260px; height: 180px; }
         }
     </style>
 </head>
@@ -206,12 +186,10 @@
         <div class="divider"></div>
     </header>
 
-    <div id="loading" class="loading-state">جاري تجهيز الشريط السينمائي وتحميل الصور...</div>
+    <div id="loading" class="loading-state">جاري الاتصال بمحرك الأقراص وجلب الصور (قد يستغرق بضع ثوانٍ)...</div>
 
     <div class="cinema-track-container" id="cinemaContainer" style="display: none;">
-        <div class="cinema-track" id="cinemaTrack">
-            <!-- ستعبأ الصور تلقائياً هنا بأمان تام ضد الثغرات -->
-        </div>
+        <div class="cinema-track" id="cinemaTrack"></div>
     </div>
 
     <footer>
@@ -221,7 +199,6 @@
     <script>
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwENIhPw3eEuZA9NJ-3VVu1N-0SFVdv9a7RQDnDvYBw8TYDUdeU5ZAKDs69i-b8zwlHhw/exec';
 
-        // دالة تعقيم النصوص ضد ثغرات الـ XSS وحقن الأكواد الخبيثة
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/&/g, "&amp;")
@@ -231,7 +208,6 @@
                       .replace(/'/g, "&#039;");
         }
 
-        // التحقق من صحة الروابط لضمان الأمان
         function isValidUrl(url) {
             try {
                 const parsed = new URL(url);
@@ -244,6 +220,8 @@
         async function initCinema() {
             try {
                 const response = await fetch(WEB_APP_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
                 const imagesData = await response.json();
                 
                 document.getElementById('loading').style.display = 'none';
@@ -259,7 +237,7 @@
                 const track = document.getElementById('cinemaTrack');
                 track.innerHTML = '';
 
-                // تكرار الصور مرتين لضمان استمرارية التمرير بشكل دائري بلا انقطاع
+                // تكرار مصفوفة الصور مرتين لضمان استمرارية التمرير بشكل دائري سلس بلا انقطاع
                 let repeatedImages = [...imagesData, ...imagesData];
 
                 repeatedImages.forEach(img => {
@@ -272,19 +250,22 @@
                     const item = document.createElement('div');
                     item.className = 'cinema-item';
                     item.innerHTML = `
-                        <img src="${safeUrl}" alt="${safeName}" loading="lazy">
+                        <img src="${safeUrl}" alt="${safeName}" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23222\'/><text x=\'50%\' y=\'50%\' fill=\'%23aaa\' font-size=\'12\' text-anchor=\'middle\' dy=\'.3em\'>صورة تعذر تحميلها</text></svg>';">
                         <div class="cinema-caption">${safeName}</div>
                     `;
                     track.appendChild(item);
                 });
 
             } catch (error) {
-                document.getElementById('loading').innerText = 'حدث خطأ في تحميل الصور. تأكد من إعدادات النشر لـ Google Apps Script.';
-                console.error("Security/Network Error Caught Safely");
+                document.getElementById('loading').innerText = 'حدث خطأ في تحميل الصور من السكربت. تأكد من إعدادات النشر على Google Apps Script.';
+                console.error("Fetch Error:", error);
             }
         }
 
-        initCinema();
+        init();
+        function init() {
+            initCinema();
+        }
     </script>
 </body>
 </html>
