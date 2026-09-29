@@ -99,4 +99,155 @@
 
         /* سرعة العرض تحسب تلقائياً حسب عدد الصور */
         .cinema-track.running {
-            animation: scrollCinemaSlow
+            animation: scrollCinemaSlow var(--duration, 500s) linear infinite; 
+        }
+
+        .cinema-track:hover {
+            animation-play-state: paused; 
+        }
+
+        /* أبعاد كل عنصر عرض */
+        .cinema-item {
+            width: 520px;
+            height: 350px;
+            background: #000;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 108, 53, 0.5);
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            position: relative;
+            flex-shrink: 0;
+            transition: transform 0.4s ease, border-color 0.4s ease;
+        }
+
+        .cinema-item:hover {
+            transform: scale(1.04) translateY(-6px);
+            border-color: var(--accent-gold);
+            box-shadow: 0 20px 50px rgba(0, 108, 53, 0.7), 0 0 30px rgba(212, 175, 55, 0.7);
+        }
+
+        .cinema-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .cinema-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent);
+            padding: 25px 20px 12px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #fff;
+            font-weight: 700;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @keyframes scrollCinemaSlow {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #6b8277;
+            font-size: 0.95rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* التوافقية مع الشاشات المتنوعة والجوالات */
+        @media screen and (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            header p {
+                font-size: 0.95rem;
+            }
+            .cinema-item {
+                width: 320px;
+                height: 220px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            header h1 {
+                font-size: 1.4rem;
+            }
+            .cinema-item {
+                width: 260px;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>الاحتفال باليوم الوطني السعودي بمدرسة عمار بن ياسر الابتدائية</h1>
+        <p>نحلم ونحقق - الشريط السينمائي الهادئ</p>
+        <div class="divider"></div>
+    </header>
+
+    <div class="cinema-track-container" id="cinemaContainer" style="display: block;">
+        <div class="cinema-track" id="cinemaTrack">
+            <!-- ستعبأ الصور تلقائياً من مجلد images -->
+        </div>
+    </div>
+
+    <footer>
+        تصميم وبرمجة أ.صلاح سعد الرحيمان
+    </footer>
+
+    <script>
+        // عدد الصور داخل مجلد images (مرقمة 1.jpeg و 2.jpeg ... )
+        const totalImages = 150;   // غيّر الرقم إلى عدد صورك
+        const SECONDS_PER_IMAGE = 4; // زد الرقم لإبطاء الحركة وقلله لتسريعها
+        const localImages = Array.from({ length: totalImages }, (_, i) => ({
+            url: `images/${i + 1}.jpeg`,
+            name: `احتفالية اليوم الوطني ${i + 1}`
+        }));
+
+        function initLocalCinema() {
+            const track = document.getElementById('cinemaTrack');
+            track.innerHTML = '';
+
+            if (!localImages || localImages.length === 0) {
+                track.innerHTML = '<div style="color:#fff; text-align:center; padding:50px; width:100%;">لا توجد صور مضافة في القائمة.</div>';
+                return;
+            }
+
+            // تكرار الصور لضمان سلاسة حركة الشريط بلا انقطاع
+            let repeatedImages = [...localImages, ...localImages];
+
+            track.style.setProperty('--duration', (localImages.length * SECONDS_PER_IMAGE) + 's');
+
+            track.classList.add('running');
+
+            repeatedImages.forEach(img => {
+                const item = document.createElement('div');
+                item.className = 'cinema-item';
+                item.innerHTML = `
+                    <img src="${img.url}" alt="${img.name}" onerror="this.parentElement.remove()">
+                    <div class="cinema-caption">${img.name}</div>
+                `;
+                track.appendChild(item);
+            });
+        }
+
+        // تشغيل الدالة عند فتح الصفحة
+        initLocalCinema();
+    </script>
+</body>
+</html>
