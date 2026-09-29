@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';">
     <title>الاحتفال باليوم الوطني السعودي - الشريط السينمائي الفاخر</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -23,7 +22,7 @@
         }
 
         body {
-            font-family: 'Cairo', sans-serif;
+            font-family: 'Cairo', Tahoma, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-light);
             min-height: 100vh;
@@ -36,7 +35,7 @@
 
         header {
             text-align: center;
-            padding: 30px 15px 15px;
+            padding: 25px 15px 10px;
             position: relative;
         }
 
@@ -60,9 +59,10 @@
             width: 180px;
             height: 3px;
             background: linear-gradient(to right, transparent, var(--accent-gold), transparent);
-            margin: 15px auto;
+            margin: 12px auto;
         }
 
+        /* حاوية الشريط السينمائي المتحرك */
         .cinema-track-container {
             width: 100%;
             overflow: hidden;
@@ -75,6 +75,7 @@
             margin: auto 0;
         }
 
+        /* إطارات شريط الفيلم السينمائي الجانبية */
         .cinema-track-container::before,
         .cinema-track-container::after {
             content: '';
@@ -92,181 +93,10 @@
             display: flex;
             gap: 30px;
             width: max-content;
-            animation: scrollRightToLeft 500s linear infinite; 
+            direction: ltr;
+            animation: none; 
         }
 
-        .cinema-track-container:hover .cinema-track {
-            animation-play-state: paused; 
-        }
-
-        .cinema-item {
-            width: 520px;
-            height: 350px;
-            background: #000;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 108, 53, 0.5);
-            border: 2px solid rgba(212, 175, 55, 0.5);
-            position: relative;
-            flex-shrink: 0;
-            transition: transform 0.4s ease, border-color 0.4s ease;
-        }
-
-        .cinema-item:hover {
-            transform: scale(1.04) translateY(-6px);
-            border-color: var(--accent-gold);
-            box-shadow: 0 20px 50px rgba(0, 108, 53, 0.7), 0 0 30px rgba(212, 175, 55, 0.7);
-        }
-
-        .cinema-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .cinema-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent);
-            padding: 25px 20px 12px;
-            text-align: center;
-            font-size: 1.1rem;
-            color: #fff;
-            font-weight: 700;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.9);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        @keyframes scrollRightToLeft {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
-        }
-
-        .loading-state {
-            text-align: center;
-            padding: 80px;
-            font-size: 1.4rem;
-            color: var(--accent-gold);
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #6b8277;
-            font-size: 0.95rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-
-        @media screen and (max-width: 768px) {
-            header h1 { font-size: 1.8rem; }
-            header p { font-size: 0.95rem; }
-            .cinema-item { width: 320px; height: 220px; }
-        }
-
-        @media screen and (max-width: 480px) {
-            header h1 { font-size: 1.4rem; }
-            .cinema-item { width: 260px; height: 180px; }
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <h1>الاحتفال باليوم الوطني السعودي بمدرسة عمار بن ياسر الابتدائية</h1>
-        <p>نحلم ونحقق - الشريط السينمائي الهادئ</p>
-        <div class="divider"></div>
-    </header>
-
-    <div id="loading" class="loading-state">جاري الاتصال بمحرك الأقراص وجلب الصور (قد يستغرق بضع ثوانٍ)...</div>
-
-    <div class="cinema-track-container" id="cinemaContainer" style="display: none;">
-        <div class="cinema-track" id="cinemaTrack"></div>
-    </div>
-
-    <footer>
-        تصميم وبرمجة أ.صلاح سعد الرحيمان
-    </footer>
-
-    <script>
-        // تم تحديث الرابط بالرابط الجديد الخاص بك
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwhhJ4lLh8JoMesbKmw5mK5bMOXe-CMdYYDVzyk2w3CRd_AAXaC2_T_ugFdk1-TEkKqEg/exec';
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, "&amp;")
-                      .replace(/</g, "&lt;")
-                      .replace(/>/g, "&gt;")
-                      .replace(/"/g, "&quot;")
-                      .replace(/'/g, "&#039;");
-        }
-
-        function isValidUrl(url) {
-            try {
-                const parsed = new URL(url);
-                return parsed.protocol === 'https:' || parsed.protocol === 'http:';
-            } catch (_) {
-                return false;
-            }
-        }
-
-        async function initCinema() {
-            try {
-                const response = await fetch(WEB_APP_URL);
-                if (!response.ok) throw new Error('Network response was not ok');
-                
-                const imagesData = await response.json();
-                
-                document.getElementById('loading').style.display = 'none';
-
-                if (!Array.isArray(imagesData) || imagesData.length === 0) {
-                    document.getElementById('cinemaContainer').style.display = 'block';
-                    document.getElementById('cinemaTrack').innerHTML = '<div style="color:#fff; text-align:center; padding:50px; width:100%;">لا توجد صور في المجلد حالياً.</div>';
-                    return;
-                }
-
-                document.getElementById('cinemaContainer').style.display = 'block';
-                
-                const track = document.getElementById('cinemaTrack');
-                track.innerHTML = '';
-
-                // تكرار مصفوفة الصور مرتين لضمان استمرارية التمرير بشكل دائري سلس بلا انقطاع
-                let repeatedImages = [...imagesData, ...imagesData];
-
-                repeatedImages.forEach(img => {
-                    if (!img || !img.url || !isValidUrl(img.url)) return;
-
-                    const rawName = img.name ? img.name.replace(/\.[^/.]+$/, "") : "صورة احتفالية";
-                    const safeName = escapeHtml(rawName);
-                    const safeUrl = encodeURI(img.url);
-
-                    const item = document.createElement('div');
-                    item.className = 'cinema-item';
-                    item.innerHTML = `
-                        <img src="${safeUrl}" alt="${safeName}" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23222\'/><text x=\'50%\' y=\'50%\' fill=\'%23aaa\' font-size=\'12\' text-anchor=\'middle\' dy=\'.3em\'>صورة تعذر تحميلها</text></svg>';">
-                        <div class="cinema-caption">${safeName}</div>
-                    `;
-                    track.appendChild(item);
-                });
-
-            } catch (error) {
-                document.getElementById('loading').innerText = 'حدث خطأ في تحميل الصور من السكربت. تأكد من إعدادات النشر على Google Apps Script.';
-                console.error("Fetch Error:", error);
-            }
-        }
-
-        init();
-        function init() {
-            initCinema();
-        }
-    </script>
-</body>
-</html>
+        /* سرعة العرض تحسب تلقائياً حسب عدد الصور */
+        .cinema-track.running {
+            animation: scrollCinemaSlow
